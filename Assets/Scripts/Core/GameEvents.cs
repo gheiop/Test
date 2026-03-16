@@ -7,6 +7,7 @@ namespace Islebound.Core
 {
     public static class GameEvents
     {
+        // ===== WORLD =====
         public static Action OnSeasonChanged;
         public static Action<SeasonType> OnSeasonChangedDetailed;
 
@@ -16,17 +17,24 @@ namespace Islebound.Core
         public static Action<float> OnTimeOfDayChanged;
         public static Action<bool> OnDayNightStateChanged;
 
+        // ===== PLAYER STATS =====
         public static Action<float, float> OnHealthChanged;
         public static Action<float, float> OnHungerChanged;
         public static Action<float, float> OnWaterChanged;
         public static Action<float, float> OnStaminaChanged;
 
-        public static Action<int> OnHotbarSelectionChanged;
-        public static Action<InventorySlot[]> OnInventoryChanged;
-
+        // ===== INTERACTION =====
         public static Action<string> OnInteractionPromptShown;
         public static Action OnInteractionPromptHidden;
 
+        // ===== BIOME =====
         public static Action<BiomeType> OnPlayerBiomeChanged;
+
+        // ===== INVENTORY / ITEMS =====
+        public static Action<InventorySlot[]> OnHotbarChanged;
+        public static Action<InventorySlot[]> OnInventoryChanged;
+        public static Action<int> OnHotbarSelectionChanged;
+        public static Action<bool> OnInventoryScreenStateChanged;
+        public static Action<ItemData, int> OnItemPickedUp;
     }
 }

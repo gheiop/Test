@@ -9,39 +9,39 @@ namespace Islebound.UI
         [SerializeField] private HotbarSlotUI[] slots;
 
         private InventorySlot[] cachedSlots;
-        private int currentSelectedIndex;
+        private int selectedIndex;
 
         private void OnEnable()
         {
-            GameEvents.OnInventoryChanged += RefreshInventory;
+            GameEvents.OnHotbarChanged += RefreshHotbar;
             GameEvents.OnHotbarSelectionChanged += RefreshSelection;
         }
 
         private void OnDisable()
         {
-            GameEvents.OnInventoryChanged -= RefreshInventory;
+            GameEvents.OnHotbarChanged -= RefreshHotbar;
             GameEvents.OnHotbarSelectionChanged -= RefreshSelection;
         }
 
         private void Start()
         {
-            if (InventoryManager.Instance != null)
-            {
-                cachedSlots = InventoryManager.Instance.HotbarSlots;
-                currentSelectedIndex = InventoryManager.Instance.SelectedHotbarIndex;
-                Redraw();
-            }
-        }
+            if (InventoryManager.Instance == null)
+                return;
 
-        private void RefreshInventory(InventorySlot[] inventorySlots)
-        {
-            cachedSlots = inventorySlots;
+            cachedSlots = InventoryManager.Instance.HotbarSlots;
+            selectedIndex = InventoryManager.Instance.SelectedHotbarIndex;
             Redraw();
         }
 
-        private void RefreshSelection(int selectedIndex)
+        private void RefreshHotbar(InventorySlot[] hotbarSlots)
         {
-            currentSelectedIndex = selectedIndex;
+            cachedSlots = hotbarSlots;
+            Redraw();
+        }
+
+        private void RefreshSelection(int index)
+        {
+            selectedIndex = index;
             Redraw();
         }
 
@@ -51,9 +51,10 @@ namespace Islebound.UI
                 return;
 
             int count = Mathf.Min(slots.Length, cachedSlots.Length);
+
             for (int i = 0; i < count; i++)
             {
-                slots[i].SetData(cachedSlots[i], i == currentSelectedIndex);
+                slots[i].SetData(cachedSlots[i], i == selectedIndex);
             }
         }
     }

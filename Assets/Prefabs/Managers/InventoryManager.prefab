@@ -45,5 +45,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Islebound.Items.InventoryManager
   hotbarSize: 8
-  hotbarSlots: []
+  inventorySize: 24
+  addToHotbarFirst: 1
+  inventoryOpen: 0
   selectedHotbarIndex: 0
+  debugLogs: 1
+  debugAddTestItemsOnStart: 0
+  debugStartItems: []
+  hotbarSlots: []
+  inventorySlots: []

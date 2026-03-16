@@ -5,18 +5,13 @@ using Islebound.Items;
 
 namespace Islebound.UI
 {
-    public class HotbarSlotUI : MonoBehaviour
+    public class InventorySlotUI : MonoBehaviour
     {
         [SerializeField] private Image iconImage;
         [SerializeField] private TMP_Text amountText;
-        [SerializeField] private GameObject selectionHighlight;
-        [SerializeField] private RectTransform slotRoot;
+        [SerializeField] private GameObject emptyStateObject;
 
-        [Header("Scale")]
-        [SerializeField] private Vector3 normalScale = Vector3.one;
-        [SerializeField] private Vector3 selectedScale = new Vector3(1.15f, 1.15f, 1.15f);
-
-        public void SetData(InventorySlot slot, bool selected)
+        public void SetData(InventorySlot slot)
         {
             bool hasItem = slot != null && !slot.IsEmpty;
 
@@ -34,14 +29,9 @@ namespace Islebound.UI
                 amountText.enabled = showAmount;
             }
 
-            if (selectionHighlight != null)
+            if (emptyStateObject != null)
             {
-                selectionHighlight.SetActive(selected);
-            }
-
-            if (slotRoot != null)
-            {
-                slotRoot.localScale = selected ? selectedScale : normalScale;
+                emptyStateObject.SetActive(!hasItem);
             }
         }
     }

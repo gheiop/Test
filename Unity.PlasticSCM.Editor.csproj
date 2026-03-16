@@ -203,8 +203,8 @@
     <Compile Include="Library\PackageCache\com.unity.collab-proxy@b8d65294b30f\Editor\Configuration\EncryptionConfigurationDialog.cs" />
     <Compile Include="Library\PackageCache\com.unity.collab-proxy@b8d65294b30f\Editor\EnumExtensions.cs" />
     <Compile Include="Library\PackageCache\com.unity.collab-proxy@b8d65294b30f\Editor\UVCSToolbar\PopupWindow\ToolbarMouseBoundary.cs" />
-    <Compile Include="Library\PackageCache\com.unity.collab-proxy@b8d65294b30f\Editor\Views\Changesets\ChangesetsListHeaderState.cs" />
     <Compile Include="Library\PackageCache\com.unity.collab-proxy@b8d65294b30f\Editor\Views\Diff\DiffSelection.cs" />
+    <Compile Include="Library\PackageCache\com.unity.collab-proxy@b8d65294b30f\Editor\Views\Changesets\ChangesetsListHeaderState.cs" />
     <Compile Include="Library\PackageCache\com.unity.collab-proxy@b8d65294b30f\Editor\Gluon\UpdateReport\ErrorListViewItem.cs" />
     <Compile Include="Library\PackageCache\com.unity.collab-proxy@b8d65294b30f\Editor\Views\CreateWorkspace\Dialogs\RepositoryExplorerDialog.cs" />
     <Compile Include="Library\PackageCache\com.unity.collab-proxy@b8d65294b30f\Editor\Views\PendingChanges\ChangeTreeViewItem.cs" />
