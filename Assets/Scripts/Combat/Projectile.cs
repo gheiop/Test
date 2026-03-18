@@ -1,16 +1,8 @@
-using System;
 using UnityEngine;
 using Islebound.Player;
 
 namespace Islebound.Combat
 {
-    public enum ProjectileResult
-    {
-        HitPlayer,
-        HitObstacle,
-        Expired
-    }
-
     public class Projectile : MonoBehaviour
     {
         [Header("Flight")]
@@ -21,17 +13,20 @@ namespace Islebound.Combat
 
         [Header("Collision")]
         [SerializeField] private LayerMask hitMask = ~0;
+        [SerializeField] private bool destroyOnWorldHit = true;
         [SerializeField] private bool ignoreOtherProjectiles = true;
         [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
+
+        [Header("Spawn Safety")]
+        [SerializeField] private bool checkSpawnOverlap = true;
+        [SerializeField] private float spawnOverlapRadiusMultiplier = 0.9f;
 
         [Header("Debug")]
         [SerializeField] private bool debugLogs = false;
 
         private Vector3 direction;
         private GameObject owner;
-        private bool isFinished;
-
-        public Action<ProjectileResult, Vector3> OnProjectileFinished;
+        private bool hasInitialized;
 
         public void Initialize(
             Vector3 dir,
@@ -47,12 +42,17 @@ namespace Islebound.Combat
             damage = projectileDamage;
             owner = projectileOwner;
             hitRadius = projectileHitRadius;
-            isFinished = false;
+            hasInitialized = true;
+
+            if (checkSpawnOverlap)
+            {
+                CheckImmediateOverlap();
+            }
         }
 
         private void Update()
         {
-            if (isFinished)
+            if (!hasInitialized)
                 return;
 
             Vector3 currentPosition = transform.position;
@@ -71,8 +71,12 @@ namespace Islebound.Combat
                     hitMask,
                     triggerInteraction))
                 {
-                    HandleHit(hit.collider, hit.point);
-                    return;
+                    bool consumed = HandleHit(hit.collider);
+
+                    if (consumed)
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -81,26 +85,60 @@ namespace Islebound.Combat
             lifetime -= Time.deltaTime;
             if (lifetime <= 0f)
             {
-                Finish(ProjectileResult.Expired, transform.position);
+                Destroy(gameObject);
             }
         }
 
-        private void HandleHit(Collider other, Vector3 hitPoint)
+        private void CheckImmediateOverlap()
+        {
+            float overlapRadius = Mathf.Max(0.01f, hitRadius * spawnOverlapRadiusMultiplier);
+
+            Collider[] overlaps = Physics.OverlapSphere(
+                transform.position,
+                overlapRadius,
+                hitMask,
+                triggerInteraction);
+
+            for (int i = 0; i < overlaps.Length; i++)
+            {
+                Collider other = overlaps[i];
+
+                if (other == null)
+                    continue;
+
+                if (owner != null && other.transform.root.gameObject == owner.transform.root.gameObject)
+                    continue;
+
+                if (ignoreOtherProjectiles && other.GetComponentInParent<Projectile>() != null)
+                    continue;
+
+                bool consumed = HandleHit(other);
+                if (consumed)
+                    return;
+            }
+        }
+
+        private bool HandleHit(Collider other)
         {
             if (other == null)
             {
-                Finish(ProjectileResult.HitObstacle, transform.position);
-                return;
+                Destroy(gameObject);
+                return true;
             }
 
             if (owner != null && other.transform.root.gameObject == owner.transform.root.gameObject)
             {
-                return;
+                return false;
             }
 
             if (ignoreOtherProjectiles && other.GetComponentInParent<Projectile>() != null)
             {
-                return;
+                if (debugLogs)
+                {
+                    Debug.Log($"[Projectile] Ignored other projectile: {other.name}");
+                }
+
+                return false;
             }
 
             DamageablePlayer player = other.GetComponentInParent<DamageablePlayer>();
@@ -112,29 +150,22 @@ namespace Islebound.Combat
                 }
 
                 player.TakeDamage(damage);
-                Finish(ProjectileResult.HitPlayer, hitPoint);
-                return;
+                Destroy(gameObject);
+                return true;
             }
 
-            if (!other.isTrigger)
+            if (destroyOnWorldHit && !other.isTrigger)
             {
                 if (debugLogs)
                 {
-                    Debug.Log($"[Projectile] Hit obstacle: {other.name}");
+                    Debug.Log($"[Projectile] Hit world object: {other.name}");
                 }
 
-                Finish(ProjectileResult.HitObstacle, hitPoint);
+                Destroy(gameObject);
+                return true;
             }
-        }
 
-        private void Finish(ProjectileResult result, Vector3 point)
-        {
-            if (isFinished)
-                return;
-
-            isFinished = true;
-            OnProjectileFinished?.Invoke(result, point);
-            Destroy(gameObject);
+            return false;
         }
 
         private void OnDrawGizmosSelected()
