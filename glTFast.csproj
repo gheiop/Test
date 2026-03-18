@@ -119,8 +119,8 @@
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\MorphTargetsGenerator.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\Schema\Material.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\GameObjectSceneInstance.cs" />
-    <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\Schema\Node.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\short3.cs" />
+    <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\Schema\Node.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\Schema\Skin.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\Material\IMaterialGenerator.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\Schema\GltfAccessorAttributeType.cs" />
@@ -178,9 +178,9 @@
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\MeshGeneratorBase.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\Logging\CollectingLogger.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\TextureDownload.cs" />
+    <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\sbyte3.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\Schema\MeshPrimitive.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\VertexBufferGeneratorBase.cs" />
-    <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\sbyte3.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\Schema\MaterialUnlit.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\Schema\Asset.cs" />
     <Compile Include="Library\PackageCache\com.unity.cloud.gltfast@e6a172d771cb\Runtime\Scripts\KtxLoadContextBase.cs" />
