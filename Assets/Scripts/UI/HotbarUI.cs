@@ -7,6 +7,7 @@ namespace Islebound.UI
     public class HotbarUI : MonoBehaviour
     {
         [SerializeField] private HotbarSlotUI[] slots;
+        [SerializeField] private bool debugLogs = false;
 
         private InventorySlot[] cachedSlots;
         private int selectedIndex;
@@ -15,6 +16,18 @@ namespace Islebound.UI
         {
             GameEvents.OnHotbarChanged += RefreshHotbar;
             GameEvents.OnHotbarSelectionChanged += RefreshSelection;
+
+            if (InventoryManager.Instance != null)
+            {
+                cachedSlots = InventoryManager.Instance.HotbarSlots;
+                selectedIndex = InventoryManager.Instance.SelectedHotbarIndex;
+                Redraw();
+
+                if (debugLogs)
+                {
+                    Debug.Log("[HotbarUI] OnEnable -> refreshed from InventoryManager.");
+                }
+            }
         }
 
         private void OnDisable()
@@ -54,7 +67,10 @@ namespace Islebound.UI
 
             for (int i = 0; i < count; i++)
             {
-                slots[i].SetData(cachedSlots[i], i == selectedIndex);
+                if (slots[i] != null)
+                {
+                    slots[i].SetData(cachedSlots[i], i == selectedIndex);
+                }
             }
         }
     }

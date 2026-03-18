@@ -7,12 +7,24 @@ namespace Islebound.UI
     public class InventoryPanelUI : MonoBehaviour
     {
         [SerializeField] private InventorySlotUI[] slots;
+        [SerializeField] private bool debugLogs = false;
 
         private InventorySlot[] cachedSlots;
 
         private void OnEnable()
         {
             GameEvents.OnInventoryChanged += RefreshInventory;
+
+            if (InventoryManager.Instance != null)
+            {
+                cachedSlots = InventoryManager.Instance.InventorySlots;
+                Redraw();
+
+                if (debugLogs)
+                {
+                    Debug.Log("[InventoryPanelUI] OnEnable -> refreshed from InventoryManager.");
+                }
+            }
         }
 
         private void OnDisable()
@@ -33,6 +45,11 @@ namespace Islebound.UI
         {
             cachedSlots = inventorySlots;
             Redraw();
+
+            if (debugLogs)
+            {
+                Debug.Log("[InventoryPanelUI] RefreshInventory event received.");
+            }
         }
 
         private void Redraw()
@@ -44,7 +61,10 @@ namespace Islebound.UI
 
             for (int i = 0; i < count; i++)
             {
-                slots[i].SetData(cachedSlots[i]);
+                if (slots[i] != null)
+                {
+                    slots[i].SetData(cachedSlots[i]);
+                }
             }
         }
     }
