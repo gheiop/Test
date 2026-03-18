@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Islebound.Player;
 
 namespace Islebound.Crafting
 {
@@ -42,6 +43,7 @@ namespace Islebound.Crafting
         private Workbench currentWorkbench;
         private CraftingRecipeData selectedRecipe;
         private float refreshTimer;
+        private PlayerLook playerLook;
 
         public bool IsOpen => workbenchRoot != null && workbenchRoot.activeSelf;
 
@@ -58,6 +60,8 @@ namespace Islebound.Crafting
 
         private void Start()
         {
+            playerLook = FindFirstObjectByType<PlayerLook>();
+
             if (craftButton != null)
             {
                 craftButton.onClick.AddListener(TryCraftSelected);
@@ -112,6 +116,7 @@ namespace Islebound.Crafting
                 stationTitleText.text = workbench.StationName;
             }
 
+            SetCursorState(true);
             BuildRecipeButtons();
             SelectFirstRecipe();
             RefreshView();
@@ -137,9 +142,24 @@ namespace Islebound.Crafting
                 feedbackText.text = string.Empty;
             }
 
+            SetCursorState(false);
+
             if (debugLogs)
             {
                 Debug.Log("[WorkbenchUI] Closed.");
+            }
+        }
+
+        private void SetCursorState(bool visible)
+        {
+            if (playerLook == null)
+            {
+                playerLook = FindFirstObjectByType<PlayerLook>();
+            }
+
+            if (playerLook != null)
+            {
+                playerLook.SetCursorVisible(visible);
             }
         }
 
@@ -161,6 +181,13 @@ namespace Islebound.Crafting
                     continue;
 
                 CraftingRecipeButtonUI button = Instantiate(recipeButtonPrefab, recipeButtonContainer);
+                RectTransform rect = button.transform as RectTransform;
+                if (rect != null)
+                {
+                    rect.localScale = Vector3.one;
+                    rect.anchoredPosition3D = Vector3.zero;
+                }
+
                 button.Setup(recipe, SelectRecipe);
                 spawnedButtons.Add(button);
             }

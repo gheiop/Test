@@ -1,5 +1,7 @@
 using UnityEngine;
 using Islebound.Items;
+using Islebound.UI;
+using Islebound.Crafting;
 
 namespace Islebound.Player
 {
@@ -27,11 +29,30 @@ namespace Islebound.Player
 
         private void Update()
         {
+            if (IsAnyGameplayBlockingUIOpen())
+            {
+                HandleUIOnlyInput();
+                return;
+            }
+
             HandleLook();
             HandleJump();
             HandleMovement();
             HandleInteraction();
             HandleHotbarSelection();
+        }
+
+        private bool IsAnyGameplayBlockingUIOpen()
+        {
+            bool inventoryOpen = InventoryManager.Instance != null && InventoryManager.Instance.IsInventoryOpen;
+            bool workbenchOpen = WorkbenchUI.Instance != null && WorkbenchUI.Instance.IsOpen;
+            return inventoryOpen || workbenchOpen;
+        }
+
+        private void HandleUIOnlyInput()
+        {
+            // Ничего не делаем специально:
+            // инвентарь и верстак сами обрабатывают свои клавиши открытия/закрытия.
         }
 
         private void HandleLook()
@@ -62,7 +83,6 @@ namespace Islebound.Player
                 return;
 
             bool jumped = motor.TryJump();
-
             if (!jumped)
             {
                 stats.SetStamina(stats.CurrentStamina + stats.JumpStaminaCost);
