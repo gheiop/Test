@@ -13,8 +13,8 @@ namespace Islebound.Combat
 
         [Header("Collision")]
         [SerializeField] private LayerMask hitMask = ~0;
-        [SerializeField] private bool hitOnlyPlayer = true;
-        [SerializeField] private bool destroyOnNonPlayerHit = false;
+        [SerializeField] private bool destroyOnWorldHit = true;
+        [SerializeField] private bool ignoreOtherProjectiles = true;
         [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
 
         [Header("Debug")]
@@ -57,7 +57,7 @@ namespace Islebound.Combat
                     hitMask,
                     triggerInteraction))
                 {
-                    bool consumed = TryHandleHit(hit.collider);
+                    bool consumed = HandleHit(hit.collider);
 
                     if (consumed)
                     {
@@ -75,7 +75,7 @@ namespace Islebound.Combat
             }
         }
 
-        private bool TryHandleHit(Collider other)
+        private bool HandleHit(Collider other)
         {
             if (other == null)
             {
@@ -85,6 +85,16 @@ namespace Islebound.Combat
 
             if (owner != null && other.transform.root.gameObject == owner.transform.root.gameObject)
             {
+                return false;
+            }
+
+            if (ignoreOtherProjectiles && other.GetComponentInParent<Projectile>() != null)
+            {
+                if (debugLogs)
+                {
+                    Debug.Log($"[Projectile] Ignored other projectile: {other.name}");
+                }
+
                 return false;
             }
 
@@ -101,21 +111,11 @@ namespace Islebound.Combat
                 return true;
             }
 
-            if (hitOnlyPlayer)
+            if (destroyOnWorldHit && !other.isTrigger)
             {
                 if (debugLogs)
                 {
-                    Debug.Log($"[Projectile] Ignored non-player hit: {other.name}");
-                }
-
-                return false;
-            }
-
-            if (destroyOnNonPlayerHit)
-            {
-                if (debugLogs)
-                {
-                    Debug.Log($"[Projectile] Hit non-player object: {other.name}");
+                    Debug.Log($"[Projectile] Hit world object: {other.name}");
                 }
 
                 Destroy(gameObject);
