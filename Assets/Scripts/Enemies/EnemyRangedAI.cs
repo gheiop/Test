@@ -32,8 +32,11 @@ namespace Islebound.Enemies
         private float attackTimer;
         private float roamWaitTimer;
         private float notAggroTimer;
-        private float losCheckTimer;
-        private float repositionTimer;
+        private float lineOfSightTimer;
+        private float repositionCooldownTimer;
+        private float stuckTimer;
+
+        private bool lastKnownDirectShot = true;
 
         private Vector3 currentRoamTarget;
         private bool hasRoamTarget;
@@ -54,11 +57,15 @@ namespace Islebound.Enemies
         private void Start()
         {
             if (enemyData != null)
+            {
                 agent.speed = enemyData.moveSpeed;
+            }
 
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
+            {
                 player = playerObj.transform;
+            }
 
             if (projectilePrefab != null && projectilePrefab.gameObject.scene.IsValid())
             {
@@ -72,8 +79,8 @@ namespace Islebound.Enemies
                 return;
 
             attackTimer -= Time.deltaTime;
-            losCheckTimer -= Time.deltaTime;
-            repositionTimer -= Time.deltaTime;
+            lineOfSightTimer -= Time.deltaTime;
+            repositionCooldownTimer -= Time.deltaTime;
 
             bool isAggro = false;
 
@@ -88,28 +95,31 @@ namespace Islebound.Enemies
                     Vector3 flatPlayerPos = new Vector3(player.position.x, transform.position.y, player.position.z);
                     transform.LookAt(flatPlayerPos);
 
-                    bool clearShot = HasClearShot();
-
                     if (distanceToPlayer > enemyData.preferredDistance)
                     {
                         currentState = AIState.Chasing;
-                        hasRepositionTarget = false;
+                        ClearRepositionTarget();
                         agent.SetDestination(player.position);
-                    }
-                    else if (enemyData.requireClearShot && !clearShot)
-                    {
-                        HandleRepositionForShot();
                     }
                     else
                     {
-                        currentState = AIState.Attacking;
-                        hasRepositionTarget = false;
-                        agent.SetDestination(transform.position);
+                        bool hasShot = HasDirectShot();
 
-                        if (attackTimer <= 0f)
+                        if (!enemyData.requireDirectLineOfSight || hasShot)
                         {
-                            attackTimer = enemyData.attackCooldown;
-                            FireProjectile();
+                            currentState = AIState.Attacking;
+                            ClearRepositionTarget();
+                            agent.SetDestination(transform.position);
+
+                            if (attackTimer <= 0f)
+                            {
+                                attackTimer = enemyData.attackCooldown;
+                                FireProjectile();
+                            }
+                        }
+                        else
+                        {
+                            HandleRepositioning();
                         }
                     }
                 }
@@ -126,22 +136,15 @@ namespace Islebound.Enemies
             HandleDespawnWhenNotAggro(isAggro);
         }
 
-        private bool HasClearShot()
+        private bool HasDirectShot()
         {
-            if (!enemyData.requireClearShot)
+            if (!enemyData.requireDirectLineOfSight)
                 return true;
 
-            if (losCheckTimer > 0f)
-                return CheckLineOfSightOnce(false);
+            if (lineOfSightTimer > 0f)
+                return lastKnownDirectShot;
 
-            losCheckTimer = enemyData.lineOfSightCheckInterval;
-            return CheckLineOfSightOnce(true);
-        }
-
-        private bool CheckLineOfSightOnce(bool drawDebug)
-        {
-            if (player == null)
-                return false;
+            lineOfSightTimer = enemyData.lineOfSightCheckInterval;
 
             Vector3 origin = firePoint != null ? firePoint.position : transform.position + Vector3.up * 1.2f;
             Vector3 target = player.position + Vector3.up * enemyData.targetHeightOffset;
@@ -149,7 +152,10 @@ namespace Islebound.Enemies
             float distance = direction.magnitude;
 
             if (distance <= 0.01f)
+            {
+                lastKnownDirectShot = true;
                 return true;
+            }
 
             direction /= distance;
 
@@ -159,27 +165,34 @@ namespace Islebound.Enemies
                 direction,
                 out RaycastHit hit,
                 distance,
-                enemyData.lineOfSightBlockMask,
+                enemyData.lineOfSightObstacleMask,
                 QueryTriggerInteraction.Ignore))
             {
-                if (drawDebug && debugDrawShotLine)
+                if (hit.transform == player || hit.transform.IsChildOf(player))
                 {
-                    Debug.DrawLine(origin, hit.point, Color.yellow, enemyData.lineOfSightCheckInterval);
+                    lastKnownDirectShot = true;
+
+                    if (debugDrawShotLine)
+                    {
+                        Debug.DrawLine(origin, target, Color.green, enemyData.lineOfSightCheckInterval);
+                    }
+
+                    return true;
                 }
 
-                if (hit.transform == player || hit.transform.IsChildOf(player))
-                    return true;
+                lastKnownDirectShot = false;
 
-                if (enemyData.ignoreEnemiesAsShotBlockers &&
-                    hit.collider.GetComponentInParent<EnemyHealth>() != null)
+                if (debugDrawShotLine)
                 {
-                    return true;
+                    Debug.DrawLine(origin, hit.point, Color.yellow, enemyData.lineOfSightCheckInterval);
                 }
 
                 return false;
             }
 
-            if (drawDebug && debugDrawShotLine)
+            lastKnownDirectShot = true;
+
+            if (debugDrawShotLine)
             {
                 Debug.DrawLine(origin, target, Color.green, enemyData.lineOfSightCheckInterval);
             }
@@ -187,62 +200,93 @@ namespace Islebound.Enemies
             return true;
         }
 
-        private void HandleRepositionForShot()
+        private void HandleRepositioning()
         {
             currentState = AIState.Repositioning;
 
-            if (!hasRepositionTarget || repositionTimer <= 0f)
+            if (!hasRepositionTarget && repositionCooldownTimer <= 0f)
             {
-                repositionTimer = enemyData.repositionRepathInterval;
-
-                if (TryFindRepositionTarget(out Vector3 bestPoint))
+                if (TryFindShotPosition(out Vector3 bestPoint))
                 {
                     currentRepositionTarget = bestPoint;
                     hasRepositionTarget = true;
+                    stuckTimer = 0f;
                     agent.SetDestination(currentRepositionTarget);
 
                     if (debugLogs)
                     {
-                        Debug.Log($"{name} repositioning for clear shot.");
+                        Debug.Log($"{name}: found reposition point.");
                     }
                 }
                 else
                 {
-                    hasRepositionTarget = false;
+                    repositionCooldownTimer = enemyData.repositionRetryCooldown;
                     agent.SetDestination(player.position);
+
+                    if (debugLogs)
+                    {
+                        Debug.Log($"{name}: no valid shot point found, moving closer.");
+                    }
                 }
             }
-            else
+
+            if (hasRepositionTarget)
             {
                 agent.SetDestination(currentRepositionTarget);
 
-                if (!agent.pathPending && agent.remainingDistance <= enemyData.repositionPointReachedDistance)
+                if (!agent.pathPending && agent.remainingDistance <= enemyData.reachedRepositionPointDistance)
                 {
-                    hasRepositionTarget = false;
+                    ClearRepositionTarget();
+                }
+                else
+                {
+                    bool notMovingEnough = agent.velocity.sqrMagnitude < 0.05f &&
+                                           agent.remainingDistance > enemyData.reachedRepositionPointDistance;
+
+                    if (notMovingEnough)
+                    {
+                        stuckTimer += Time.deltaTime;
+
+                        if (stuckTimer >= enemyData.stuckRepathTime)
+                        {
+                            if (debugLogs)
+                            {
+                                Debug.Log($"{name}: got stuck while repositioning, searching new point.");
+                            }
+
+                            ClearRepositionTarget();
+                            repositionCooldownTimer = enemyData.repositionRetryCooldown;
+                        }
+                    }
+                    else
+                    {
+                        stuckTimer = 0f;
+                    }
                 }
             }
         }
 
-        private bool TryFindRepositionTarget(out Vector3 bestPoint)
+        private bool TryFindShotPosition(out Vector3 bestPoint)
         {
             bestPoint = Vector3.zero;
 
             if (player == null)
                 return false;
 
-            float bestScore = float.MaxValue;
             bool found = false;
+            float bestScore = float.MaxValue;
+            Vector3 playerPos = player.position;
 
             for (int i = 0; i < enemyData.repositionSampleCount; i++)
             {
-                Vector2 randomCircle = Random.insideUnitCircle * enemyData.repositionSearchRadius;
-                Vector3 candidate = transform.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
+                Vector2 circle = Random.insideUnitCircle * enemyData.repositionSearchRadius;
+                Vector3 candidate = transform.position + new Vector3(circle.x, 0f, circle.y);
 
-                if (!NavMesh.SamplePosition(candidate, out NavMeshHit hit, enemyData.navMeshSampleRadius, NavMesh.AllAreas))
+                if (!NavMesh.SamplePosition(candidate, out NavMeshHit navHit, enemyData.navMeshSampleRadius, NavMesh.AllAreas))
                     continue;
 
-                Vector3 point = hit.position;
-                float distanceToPlayer = Vector3.Distance(point, player.position);
+                Vector3 point = navHit.position;
+                float distanceToPlayer = Vector3.Distance(point, playerPos);
 
                 if (distanceToPlayer < enemyData.repositionMinDistanceToPlayer)
                     continue;
@@ -253,7 +297,7 @@ namespace Islebound.Enemies
                 if (!BiomeUtility.IsPointInsideAnyAllowedBiome(point, enemyData.allowedBiomes))
                     continue;
 
-                if (!HasClearShotFromPoint(point))
+                if (!HasDirectShotFromPoint(point))
                     continue;
 
                 NavMeshPath path = new NavMeshPath();
@@ -276,18 +320,18 @@ namespace Islebound.Enemies
             return found;
         }
 
-        private bool HasClearShotFromPoint(Vector3 point)
+        private bool HasDirectShotFromPoint(Vector3 point)
         {
             if (player == null)
                 return false;
 
-            float heightOffset = 1.2f;
+            float fireHeight = 1.2f;
             if (firePoint != null)
             {
-                heightOffset = firePoint.position.y - transform.position.y;
+                fireHeight = firePoint.position.y - transform.position.y;
             }
 
-            Vector3 origin = point + Vector3.up * heightOffset;
+            Vector3 origin = point + Vector3.up * fireHeight;
             Vector3 target = player.position + Vector3.up * enemyData.targetHeightOffset;
             Vector3 direction = target - origin;
             float distance = direction.magnitude;
@@ -303,22 +347,75 @@ namespace Islebound.Enemies
                 direction,
                 out RaycastHit hit,
                 distance,
-                enemyData.lineOfSightBlockMask,
+                enemyData.lineOfSightObstacleMask,
                 QueryTriggerInteraction.Ignore))
             {
-                if (hit.transform == player || hit.transform.IsChildOf(player))
-                    return true;
-
-                if (enemyData.ignoreEnemiesAsShotBlockers &&
-                    hit.collider.GetComponentInParent<EnemyHealth>() != null)
-                {
-                    return true;
-                }
-
-                return false;
+                return hit.transform == player || hit.transform.IsChildOf(player);
             }
 
             return true;
+        }
+
+        private void ClearRepositionTarget()
+        {
+            hasRepositionTarget = false;
+            stuckTimer = 0f;
+        }
+
+        private void HandleProjectileFinished(ProjectileResult result, Vector3 hitPoint)
+        {
+            if (result == ProjectileResult.HitObstacle)
+            {
+                lastKnownDirectShot = false;
+                ClearRepositionTarget();
+                repositionCooldownTimer = 0f;
+
+                if (debugLogs)
+                {
+                    Debug.Log($"{name}: projectile was blocked by obstacle, forcing reposition.");
+                }
+            }
+        }
+
+        private void FireProjectile()
+        {
+            if (projectilePrefab == null || firePoint == null || player == null)
+            {
+                if (debugLogs)
+                {
+                    Debug.LogWarning($"{name}: missing projectile prefab / fire point / player");
+                }
+
+                return;
+            }
+
+            Vector3 targetPoint = player.position + Vector3.up * enemyData.targetHeightOffset;
+            Vector3 direction = (targetPoint - firePoint.position).normalized;
+
+            Projectile projectile = Instantiate(
+                projectilePrefab,
+                firePoint.position,
+                Quaternion.LookRotation(direction));
+
+            projectile.Initialize(
+                direction,
+                enemyData.projectileSpeed,
+                enemyData.projectileLifetime,
+                enemyData.contactDamage,
+                gameObject,
+                enemyData.projectileHitRadius);
+
+            projectile.OnProjectileFinished += HandleProjectileFinished;
+
+            if (debugLogs)
+            {
+                Debug.Log($"{name} fired projectile.");
+            }
+
+            if (debugDrawShotLine)
+            {
+                Debug.DrawLine(firePoint.position, targetPoint, Color.red, 0.5f);
+            }
         }
 
         private void HandleDespawnWhenNotAggro(bool isAggro)
@@ -345,7 +442,9 @@ namespace Islebound.Enemies
             if (notAggroTimer >= enemyData.despawnDelayAfterLosingAggro)
             {
                 if (debugLogs)
+                {
                     Debug.Log($"{name} despawned after being non-aggro for {notAggroTimer:F1}s");
+                }
 
                 Destroy(gameObject);
             }
@@ -353,7 +452,7 @@ namespace Islebound.Enemies
 
         private void HandleIdleOrReturn()
         {
-            hasRepositionTarget = false;
+            ClearRepositionTarget();
 
             bool insideAllowedBiome = BiomeUtility.IsPointInsideAnyAllowedBiome(transform.position, enemyData.allowedBiomes);
 
@@ -383,7 +482,9 @@ namespace Islebound.Enemies
                 agent.SetDestination(point);
 
                 if (debugLogs)
+                {
                     Debug.Log($"{name} returning to nearest allowed biome: {nearestBiome.BiomeType}");
+                }
             }
         }
 
@@ -405,7 +506,9 @@ namespace Islebound.Enemies
                     agent.SetDestination(currentRoamTarget);
 
                     if (debugLogs)
+                    {
                         Debug.Log($"{name} roaming to biome {currentRoamBiome.BiomeType}");
+                    }
                 }
 
                 return;
@@ -421,39 +524,6 @@ namespace Islebound.Enemies
                     hasRoamTarget = false;
                 }
             }
-        }
-
-        private void FireProjectile()
-        {
-            if (projectilePrefab == null || firePoint == null || player == null)
-            {
-                if (debugLogs)
-                    Debug.LogWarning($"{name}: missing projectile prefab / fire point / player");
-
-                return;
-            }
-
-            Vector3 targetPoint = player.position + Vector3.up * enemyData.targetHeightOffset;
-            Vector3 direction = (targetPoint - firePoint.position).normalized;
-
-            Projectile projectile = Instantiate(
-                projectilePrefab,
-                firePoint.position,
-                Quaternion.LookRotation(direction));
-
-            projectile.Initialize(
-                direction,
-                enemyData.projectileSpeed,
-                enemyData.projectileLifetime,
-                enemyData.contactDamage,
-                gameObject,
-                enemyData.projectileHitRadius);
-
-            if (debugLogs)
-                Debug.Log($"{name} fired projectile at body");
-
-            if (debugDrawShotLine)
-                Debug.DrawLine(firePoint.position, targetPoint, Color.red, 0.5f);
         }
 
         private void OnDrawGizmosSelected()

@@ -1,8 +1,16 @@
+using System;
 using UnityEngine;
 using Islebound.Player;
 
 namespace Islebound.Combat
 {
+    public enum ProjectileResult
+    {
+        HitPlayer,
+        HitObstacle,
+        Expired
+    }
+
     public class Projectile : MonoBehaviour
     {
         [Header("Flight")]
@@ -13,7 +21,6 @@ namespace Islebound.Combat
 
         [Header("Collision")]
         [SerializeField] private LayerMask hitMask = ~0;
-        [SerializeField] private bool destroyOnWorldHit = true;
         [SerializeField] private bool ignoreOtherProjectiles = true;
         [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
 
@@ -22,6 +29,9 @@ namespace Islebound.Combat
 
         private Vector3 direction;
         private GameObject owner;
+        private bool isFinished;
+
+        public Action<ProjectileResult, Vector3> OnProjectileFinished;
 
         public void Initialize(
             Vector3 dir,
@@ -37,10 +47,14 @@ namespace Islebound.Combat
             damage = projectileDamage;
             owner = projectileOwner;
             hitRadius = projectileHitRadius;
+            isFinished = false;
         }
 
         private void Update()
         {
+            if (isFinished)
+                return;
+
             Vector3 currentPosition = transform.position;
             Vector3 nextPosition = currentPosition + direction * speed * Time.deltaTime;
             Vector3 travel = nextPosition - currentPosition;
@@ -57,12 +71,8 @@ namespace Islebound.Combat
                     hitMask,
                     triggerInteraction))
                 {
-                    bool consumed = HandleHit(hit.collider);
-
-                    if (consumed)
-                    {
-                        return;
-                    }
+                    HandleHit(hit.collider, hit.point);
+                    return;
                 }
             }
 
@@ -71,31 +81,26 @@ namespace Islebound.Combat
             lifetime -= Time.deltaTime;
             if (lifetime <= 0f)
             {
-                Destroy(gameObject);
+                Finish(ProjectileResult.Expired, transform.position);
             }
         }
 
-        private bool HandleHit(Collider other)
+        private void HandleHit(Collider other, Vector3 hitPoint)
         {
             if (other == null)
             {
-                Destroy(gameObject);
-                return true;
+                Finish(ProjectileResult.HitObstacle, transform.position);
+                return;
             }
 
             if (owner != null && other.transform.root.gameObject == owner.transform.root.gameObject)
             {
-                return false;
+                return;
             }
 
             if (ignoreOtherProjectiles && other.GetComponentInParent<Projectile>() != null)
             {
-                if (debugLogs)
-                {
-                    Debug.Log($"[Projectile] Ignored other projectile: {other.name}");
-                }
-
-                return false;
+                return;
             }
 
             DamageablePlayer player = other.GetComponentInParent<DamageablePlayer>();
@@ -107,22 +112,29 @@ namespace Islebound.Combat
                 }
 
                 player.TakeDamage(damage);
-                Destroy(gameObject);
-                return true;
+                Finish(ProjectileResult.HitPlayer, hitPoint);
+                return;
             }
 
-            if (destroyOnWorldHit && !other.isTrigger)
+            if (!other.isTrigger)
             {
                 if (debugLogs)
                 {
-                    Debug.Log($"[Projectile] Hit world object: {other.name}");
+                    Debug.Log($"[Projectile] Hit obstacle: {other.name}");
                 }
 
-                Destroy(gameObject);
-                return true;
+                Finish(ProjectileResult.HitObstacle, hitPoint);
             }
+        }
 
-            return false;
+        private void Finish(ProjectileResult result, Vector3 point)
+        {
+            if (isFinished)
+                return;
+
+            isFinished = true;
+            OnProjectileFinished?.Invoke(result, point);
+            Destroy(gameObject);
         }
 
         private void OnDrawGizmosSelected()
