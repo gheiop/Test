@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a61b5010a4abe847a0d491f30efa29a, type: 3}
+  m_Name: SO_Recipe_PrimitivePickaxe
+  m_EditorClassIdentifier: Assembly-CSharp::Islebound.Crafting.CraftingRecipeData
+  recipeId: primitive_pickaxe
+  displayName: Primitive Pickaxe
+  description: "\u041E\u0431\u044B\u0447\u043D\u0430\u044F \u043A\u0438\u0440\u043A\u0430"
+  outputItem: {fileID: 11400000, guid: 4d34d8564e06fd345b19cf4a9d36c4a6, type: 2}
+  outputAmount: 1
+  iconOverride: {fileID: 0}
+  ingredients:
+  - item: {fileID: 11400000, guid: 93edd5fb267483d43a563ed2a7fce608, type: 2}
+    amount: 3
+  - item: {fileID: 11400000, guid: d6cef52a66431ee41a1f87f233d25bea, type: 2}
+    amount: 2
+  unlockedByDefault: 1
+  debugLogs: 0

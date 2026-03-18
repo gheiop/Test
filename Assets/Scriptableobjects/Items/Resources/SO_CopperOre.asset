@@ -20,6 +20,7 @@ MonoBehaviour:
   stackable: 1
   maxStack: 99
   icon: {fileID: 0}
+  iconTint: {r: 1, g: 0, b: 0.87590456, a: 1}
   worldPrefab: {fileID: 0}
   isTool: 0
   durability: 100

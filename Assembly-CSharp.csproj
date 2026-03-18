@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\Scripts\Items\IInteractable.cs" />
+    <Compile Include="Assets\Scripts\Crafting\CraftingRecipeData.cs" />
     <Compile Include="Assets\Scripts\Items\WorldItem.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
     <Compile Include="Assets\Scripts\World\BiomeVisualGroup.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="Assets\Scripts\UI\InventoryPanelUI.cs" />
     <Compile Include="Assets\Scripts\Factions\FactionManager.cs" />
     <Compile Include="Assets\Scripts\Combat\Projectile.cs" />
+    <Compile Include="Assets\Scripts\Crafting\CraftingManager.cs" />
     <Compile Include="Assets\Scripts\Items\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\Enemies\EnemyHealth.cs" />
     <Compile Include="Assets\Scripts\Core\BootstrapLoader.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Assets\Scripts\Enemies\NightEnemySpawner.cs" />
     <Compile Include="Assets\Scripts\Core\GameEvents.cs" />
     <Compile Include="Assets\Scripts\World\BiomeZone.cs" />
+    <Compile Include="Assets\Scripts\Crafting\WorkbenchUI.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerMotor.cs" />
     <Compile Include="Assets\Scripts\World\PlayerBiomeDetector.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
@@ -118,6 +121,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
     <Compile Include="Assets\Scripts\Enemies\EnemyMeleeAI.cs" />
+    <Compile Include="Assets\Scripts\Crafting\CraftingRecipeButtonUI.cs" />
     <Compile Include="Assets\Scripts\Enemies\EnemyTimeRule.cs" />
     <Compile Include="Assets\Scripts\World\WorldTimeManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
@@ -132,6 +136,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
     <Compile Include="Assets\Scripts\Events\EventManager.cs" />
     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
+    <Compile Include="Assets\Scripts\Crafting\Workbench.cs" />
     <Compile Include="Assets\Scripts\Enemies\EnemyPatrol.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerLook.cs" />
   </ItemGroup>

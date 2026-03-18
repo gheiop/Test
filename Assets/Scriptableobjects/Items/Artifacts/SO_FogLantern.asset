@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4be5e2b480041684eacf7ddeb29dbd38, type: 3}
-  m_Name: SO_PrimitivePickaxe
+  m_Name: SO_FogLantern
   m_EditorClassIdentifier: Assembly-CSharp::Islebound.Items.ItemData
-  itemId: primitive_pickaxe
-  displayName: Primitive Pickaxe
+  itemId: fog_lantern
+  displayName: Fog Lantern
   description: Item description.
-  category: 2
-  rarity: 2
+  category: 4
+  rarity: 1
   stackable: 0
   maxStack: 1
   icon: {fileID: 0}
-  iconTint: {r: 1, g: 0.981875, b: 0, a: 1}
+  iconTint: {r: 0, g: 0.9641509, b: 1, a: 1}
   worldPrefab: {fileID: 0}
-  isTool: 1
+  isTool: 0
   durability: 100
   gatherPower: 1
   debugLogWhenUsed: 0

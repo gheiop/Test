@@ -1,6 +1,7 @@
 using UnityEngine;
 using Islebound.Items;
 using Islebound.Factions;
+using Islebound.Crafting;
 
 namespace Islebound.Core
 {
@@ -14,6 +15,7 @@ namespace Islebound.Core
         [SerializeField] private EventManager eventManagerPrefab;
         [SerializeField] private FactionManager factionManagerPrefab;
         [SerializeField] private InventoryManager inventoryManagerPrefab;
+        [SerializeField] private CraftingManager craftingManagerPrefab;
 
         private void Awake()
         {
@@ -24,6 +26,7 @@ namespace Islebound.Core
             CreateIfMissing(eventManagerPrefab);
             CreateIfMissing(factionManagerPrefab);
             CreateIfMissing(inventoryManagerPrefab);
+            CreateIfMissing(craftingManagerPrefab);
         }
 
         private void CreateIfMissing<T>(T prefab) where T : MonoBehaviour
