@@ -5,10 +5,19 @@ namespace Islebound.Combat
 {
     public class Projectile : MonoBehaviour
     {
+        [Header("Flight")]
         [SerializeField] private float speed = 12f;
         [SerializeField] private float lifetime = 4f;
         [SerializeField] private int damage = 10;
         [SerializeField] private float hitRadius = 0.2f;
+
+        [Header("Collision")]
+        [SerializeField] private LayerMask hitMask = ~0;
+        [SerializeField] private bool hitOnlyPlayer = true;
+        [SerializeField] private bool destroyOnNonPlayerHit = false;
+        [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
+
+        [Header("Debug")]
         [SerializeField] private bool debugLogs = false;
 
         private Vector3 direction;
@@ -45,11 +54,15 @@ namespace Islebound.Combat
                     travel.normalized,
                     out RaycastHit hit,
                     distance,
-                    ~0,
-                    QueryTriggerInteraction.Collide))
+                    hitMask,
+                    triggerInteraction))
                 {
-                    HandleHit(hit.collider);
-                    return;
+                    bool consumed = TryHandleHit(hit.collider);
+
+                    if (consumed)
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -57,38 +70,59 @@ namespace Islebound.Combat
 
             lifetime -= Time.deltaTime;
             if (lifetime <= 0f)
+            {
                 Destroy(gameObject);
+            }
         }
 
-        private void HandleHit(Collider other)
+        private bool TryHandleHit(Collider other)
         {
             if (other == null)
             {
                 Destroy(gameObject);
-                return;
+                return true;
             }
 
             if (owner != null && other.transform.root.gameObject == owner.transform.root.gameObject)
-                return;
+            {
+                return false;
+            }
 
             DamageablePlayer player = other.GetComponentInParent<DamageablePlayer>();
             if (player != null)
             {
                 if (debugLogs)
-                    Debug.Log($"Projectile hit player for {damage}");
+                {
+                    Debug.Log($"[Projectile] Hit player for {damage}");
+                }
 
                 player.TakeDamage(damage);
                 Destroy(gameObject);
-                return;
+                return true;
             }
 
-            if (!other.isTrigger)
+            if (hitOnlyPlayer)
             {
                 if (debugLogs)
-                    Debug.Log($"Projectile hit world object: {other.name}");
+                {
+                    Debug.Log($"[Projectile] Ignored non-player hit: {other.name}");
+                }
+
+                return false;
+            }
+
+            if (destroyOnNonPlayerHit)
+            {
+                if (debugLogs)
+                {
+                    Debug.Log($"[Projectile] Hit non-player object: {other.name}");
+                }
 
                 Destroy(gameObject);
+                return true;
             }
+
+            return false;
         }
 
         private void OnDrawGizmosSelected()

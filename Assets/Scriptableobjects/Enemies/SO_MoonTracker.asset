@@ -36,4 +36,4 @@ MonoBehaviour:
   projectileLifetime: 4
   preferredDistance: 8
   projectileHitRadius: 0.25
-  targetHeightOffset: 0.01
+  targetHeightOffset: 0.7

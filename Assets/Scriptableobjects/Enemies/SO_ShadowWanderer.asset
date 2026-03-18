@@ -29,10 +29,11 @@ MonoBehaviour:
   randomPointSampleAttempts: 10
   returnToNearestAllowedBiomeWhenIdle: 1
   roamAcrossAllAllowedBiomes: 1
-  canDespawnWhenIdle: 1
-  idleDespawnDelay: 2
+  canDespawnWhenNotAggro: 1
+  despawnDelayAfterLosingAggro: 20
   minDistanceFromPlayerToDespawn: 25
   projectileSpeed: 12
   projectileLifetime: 4
   preferredDistance: 8
   projectileHitRadius: 0.25
+  targetHeightOffset: 0.7
