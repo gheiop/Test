@@ -405,5 +405,25 @@ namespace Islebound.Items
             GameEvents.OnHotbarSelectionChanged?.Invoke(selectedHotbarIndex);
             GameEvents.OnInventoryScreenStateChanged?.Invoke(inventoryOpen);
         }
+
+        [ContextMenu("Debug Print Inventory Contents")]
+private void DebugPrintInventoryContents()
+{
+    Debug.Log("=== HOTBAR ===");
+    for (int i = 0; i < hotbarSlots.Length; i++)
+    {
+        string itemName = hotbarSlots[i].IsEmpty ? "EMPTY" : hotbarSlots[i].Item.DisplayName;
+        int amount = hotbarSlots[i].IsEmpty ? 0 : hotbarSlots[i].Amount;
+        Debug.Log($"Hotbar[{i}] = {itemName} x{amount}");
+    }
+
+    Debug.Log("=== INVENTORY ===");
+    for (int i = 0; i < inventorySlots.Length; i++)
+    {
+        string itemName = inventorySlots[i].IsEmpty ? "EMPTY" : inventorySlots[i].Item.DisplayName;
+        int amount = inventorySlots[i].IsEmpty ? 0 : inventorySlots[i].Amount;
+        Debug.Log($"Inventory[{i}] = {itemName} x{amount}");
+    }
+}
     }
 }

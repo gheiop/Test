@@ -16225,6 +16225,67 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1470876895}
   m_CullTransparentMesh: 1
+--- !u!1001 &1473981781
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -6769691430286951708, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.019824982
+      objectReference: {fileID: 0}
+    - target: {fileID: -6769691430286951708, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.05000019
+      objectReference: {fileID: 0}
+    - target: {fileID: -6769691430286951708, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 3.1743784
+      objectReference: {fileID: 0}
+    - target: {fileID: -6769691430286951708, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -6769691430286951708, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6769691430286951708, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6769691430286951708, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6769691430286951708, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6769691430286951708, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6769691430286951708, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6635245195314443262, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
+    - target: {fileID: 6635245195314443262, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
+      propertyPath: m_Name
+      value: playerSKIN
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: -4161369568681901532, guid: 43455c8eb86c4f444b12c4a46fd8693f, type: 3}
 --- !u!1 &1482976225
 GameObject:
   m_ObjectHideFlags: 0
@@ -23555,7 +23616,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Islebound.Items.WorldItem
   itemData: {fileID: 11400000, guid: 93edd5fb267483d43a563ed2a7fce608, type: 2}
-  amount: 2400
+  amount: 792
   destroyOnPickup: 1
   debugLogs: 0
 --- !u!65 &1701335465
@@ -32136,3 +32197,4 @@ SceneRoots:
   - {fileID: 681869033}
   - {fileID: 915472534}
   - {fileID: 594775833}
+  - {fileID: 1473981781}
