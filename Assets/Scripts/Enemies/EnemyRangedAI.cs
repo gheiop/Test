@@ -362,21 +362,6 @@ namespace Islebound.Enemies
             stuckTimer = 0f;
         }
 
-        private void HandleProjectileFinished(ProjectileResult result, Vector3 hitPoint)
-        {
-            if (result == ProjectileResult.HitObstacle)
-            {
-                lastKnownDirectShot = false;
-                ClearRepositionTarget();
-                repositionCooldownTimer = 0f;
-
-                if (debugLogs)
-                {
-                    Debug.Log($"{name}: projectile was blocked by obstacle, forcing reposition.");
-                }
-            }
-        }
-
         private void FireProjectile()
         {
             if (projectilePrefab == null || firePoint == null || player == null)
@@ -403,9 +388,7 @@ namespace Islebound.Enemies
                 enemyData.projectileLifetime,
                 enemyData.contactDamage,
                 gameObject,
-                enemyData.projectileHitRadius);
-
-            projectile.OnProjectileFinished += HandleProjectileFinished;
+                enemyData.projectileHitRadius);            
 
             if (debugLogs)
             {
