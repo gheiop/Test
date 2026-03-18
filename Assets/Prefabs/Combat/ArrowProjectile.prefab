@@ -158,8 +158,7 @@ MonoBehaviour:
   hitRadius: 0.2
   hitMask:
     serializedVersion: 2
-    m_Bits: 4294967295
-  destroyOnWorldHit: 1
+    m_Bits: 503
   ignoreOtherProjectiles: 1
   triggerInteraction: 1
   debugLogs: 0
