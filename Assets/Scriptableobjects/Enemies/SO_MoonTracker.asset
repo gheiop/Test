@@ -37,14 +37,15 @@ MonoBehaviour:
   preferredDistance: 8
   projectileHitRadius: 0.25
   targetHeightOffset: 0.7
-  requireClearShotToAttack: 1
+  requireClearShot: 1
+  lineOfSightCheckInterval: 0.15
   lineOfSightBlockMask:
     serializedVersion: 2
     m_Bits: 247
-  lineOfSightCheckInterval: 0.15
-  repositionSearchRadius: 6
-  repositionSampleCount: 16
-  repositionRepathInterval: 0.4
-  repositionMinDistanceFromPlayer: 4
-  repositionMaxDistanceFromPlayer: 9
-  keepRepositionInsideAllowedBiomes: 1
+  ignoreEnemiesAsShotBlockers: 0
+  repositionSearchRadius: 5
+  repositionSampleCount: 14
+  repositionRepathInterval: 0.35
+  repositionPointReachedDistance: 1.1
+  repositionMinDistanceToPlayer: 4
+  repositionMaxDistanceToPlayer: 9

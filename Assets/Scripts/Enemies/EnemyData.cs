@@ -45,15 +45,18 @@ namespace Islebound.Enemies
         public float projectileHitRadius = 0.25f;
         public float targetHeightOffset = 0.75f;
 
-        [Header("Ranged Line Of Sight")]
-        public bool requireClearShotToAttack = true;
-        public LayerMask lineOfSightBlockMask = ~0;
+        [Header("Ranged LOS")]
+        public bool requireClearShot = true;
         public float lineOfSightCheckInterval = 0.15f;
-        public float repositionSearchRadius = 6f;
-        public int repositionSampleCount = 16;
-        public float repositionRepathInterval = 0.4f;
-        public float repositionMinDistanceFromPlayer = 4f;
-        public float repositionMaxDistanceFromPlayer = 9f;
-        public bool keepRepositionInsideAllowedBiomes = true;
+        public LayerMask lineOfSightBlockMask = ~0;
+        public bool ignoreEnemiesAsShotBlockers = true;
+
+        [Header("Ranged Reposition")]
+        public float repositionSearchRadius = 5f;
+        public int repositionSampleCount = 14;
+        public float repositionRepathInterval = 0.35f;
+        public float repositionPointReachedDistance = 1.1f;
+        public float repositionMinDistanceToPlayer = 4f;
+        public float repositionMaxDistanceToPlayer = 9f;
     }
 }
